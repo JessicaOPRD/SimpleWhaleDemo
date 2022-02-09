@@ -6,7 +6,9 @@ name: CI to Docker Hub
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    branches: [ master ]
+    # branches: [ master ]
+    tags:
+      - "v*.*.*"
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -52,7 +54,11 @@ jobs:
           builder: ${{ steps.buildx.outputs.name }}
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/simplewhale:latest
-          # `cache-to` must be executed before `cache-from`?
+          # `cache-to` must be executed before `cache-from`? Or possibly this
+          # fails on the first run because the cache doesn't exist, but
+          # subsequent builds work?
+          # "local cache import at /tmp/.buildx-cache not found due to err"
+          # https://github.com/docker/buildx/issues/206
           cache-to: type=local,dest=/tmp/.buildx-cache
           cache-from: type=local,src=/tmp/.buildx-cache
 
